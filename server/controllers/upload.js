@@ -2,6 +2,7 @@
 
 /****** 3rd party modules *******/
 const mime = require('mime-types');
+const { PDFDocument, EncryptedPDFError } = require('pdf-lib')
 
 /******** Helpers **********/
 const responseHelper = require('../helpers/responses');
@@ -25,6 +26,11 @@ module.exports.uploadFile = async(req, res, next) => {
         // console.log("mimeType***", mimeType)
         let fileMimeType= await fileFilter(fileName, mimeType);
 
+        if(fileMimeType === "application/pdf"){
+            let pdfChecker = await mimeTypeChecks(fileData.buffer)
+            // console.log("pdf***", pdfChecker)
+            if(pdfChecker.message) throw Error(pdfChecker.message)
+        }
         // let currentTimestamp = Math.floor(Date.now() / 1000);
         let fileTypeSplit = fileMimeType.split('/')
         let uploadFileData = {
@@ -91,20 +97,14 @@ const fileFilter = async (filename, mimetype) =>{
     }
 };
 
-// const mimeTypeChecks = (fileData, callback) => {
-//     try {
-//         const encryptedPdfBytes = fileData
-//         // Assignment fails. Throws an `EncryptedPDFError`.
-//         PDFDocument.load(encryptedPdfBytes)
-//             .then((data) => {
-//                 // console.log("pdfDoc****", data)
-//                 callback(null, data)
-//             }).catch((err) => {
-//                 console.log("error-1", err)
-//                 callback("cannot upload encrypted file")
-//             })
-//     } catch (error) {
-//         console.log("error", error)
-//         callback("cannot upload encrypted file")
-//     }
-// }
+const mimeTypeChecks = async (fileData) => {
+    try {
+        const encryptedPdfBytes = fileData
+        // Assignment fails. Throws an `EncryptedPDFError`.
+        let pdfData = await PDFDocument.load(encryptedPdfBytes)
+        return pdfData;
+    } catch (error) {
+        console.log("error****", error)
+        return ({message: responseMessages.ENCRYPTED_FILE})
+    }
+}
