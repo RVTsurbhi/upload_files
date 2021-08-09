@@ -1,8 +1,8 @@
-#**Upload and Download File in nodejs**
+#Upload and Download File in nodejs
 
 ---
 
-###Upload file
+**Upload file**
 
 - use any multi-part module to upload file
 - mimetype checks to upload only selected types of files
@@ -12,7 +12,7 @@
 
 ---
 
-###Download file
+**Download file**
 
 - set response content type
 - set Content-Disposition response header
